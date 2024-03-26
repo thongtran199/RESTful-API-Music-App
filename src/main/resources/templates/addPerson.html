@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/addPerson}" method="post" th:object="${SInger}">
+    <input type="text" name="ten" th:field="*{ten}">
+    <br>
+    <input type="text" name="nghe" th:field="*{nghe}">
+    <br>
+
+    <div th:each="addr, iterStat : *{address}">
+        <input type="text" th:name="'address[' + ${iterStat.index} + '].phuong'" th:field="*{address[__${iterStat.index}__].phuong}">
+        <br>
+        <input type="text" th:name="'address[' + ${iterStat.index} + '].quan'" th:field="*{address[__${iterStat.index}__].quan}">
+        <br>
+    </div>
+    <button type="submit">Add</button>
+</form>
+</body>
+</html>

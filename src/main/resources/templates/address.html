@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:each="item : ${address}">
+  <span th:text="${item.phuong}"></span>
+  <span>-</span>
+  <span th:text="${item.quan}"></span>
+</div>
+</body>
+</html>

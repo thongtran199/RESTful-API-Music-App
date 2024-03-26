@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/addAddress}" method="post" th:object="${address}">
+    <input type="text" name="phuong" th:field="*{phuong}">
+    <br>
+    <input type="text" name="quan" th:field="*{quan}">
+    <br>
+    <button type="submit">Add</button>
+</form>
+</body>
+</html>
