@@ -4,6 +4,8 @@ import com.example.demo.domain.entities.Album;
 import com.example.demo.repositories.AlbumRepository;
 import com.example.demo.services.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,5 +33,11 @@ public class AlbumServiceImpl implements AlbumService {
     @Override
     public Optional<Album> findOne(Long id) {
         return AlbumRepository.findById(id);
+    }
+
+    @Override
+    public Page<Album> findAllByOrderByPopularityDesc(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        return AlbumRepository.findAllByOrderByPopularityDesc(pageable);
     }
 }

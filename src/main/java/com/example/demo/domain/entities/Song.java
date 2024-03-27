@@ -47,6 +47,9 @@ public class Song {
     @Column(name = "releaseDate")
     public LocalDate releaseDate;
 
+    @Column(name=" isActive")
+    public Boolean isActive;
+
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "user_song")
     public List<User> users;

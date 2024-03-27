@@ -34,6 +34,9 @@ public class Playlist {
     @Column(name = "createDate")
     public LocalDate createDate;
 
+    @Column(name = "isActive")
+    public Boolean isActive;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "idUser")

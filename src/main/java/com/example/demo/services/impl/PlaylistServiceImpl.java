@@ -32,4 +32,9 @@ public class PlaylistServiceImpl implements PlaylistService {
     public Optional<Playlist> findOne(Long id) {
         return PlaylistRepository.findById(id);
     }
+
+    @Override
+    public List<Playlist> findAllByIdUserAndIsActiveTrue(Long idUser) {
+        return PlaylistRepository.findAllByIdUserAndIsActiveTrue(idUser);
+    }
 }

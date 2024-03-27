@@ -33,6 +33,9 @@ public class Album {
     @Column(name = "popularity")
     public Integer popularity;
 
+    @Column(name = "isActive")
+    public Boolean isActive;
+
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "user_album")
     public List<User> users;

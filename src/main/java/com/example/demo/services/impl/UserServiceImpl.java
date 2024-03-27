@@ -32,4 +32,38 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findOne(Long id) {
         return UserRepository.findById(id);
     }
+
+    @Override
+    public Boolean isExist(Long id) {
+        return UserRepository.existsById(id);
+    }
+
+
+    @Override
+    public User findByUsername(String username) {
+        Optional<User> foundUser = UserRepository.findByUsername(username);
+        return foundUser.orElse(null);
+    }
+
+    @Override
+    public User signUp(User postUser, Integer type) {
+        Optional<User> foundUser = UserRepository.findByUsername(postUser.getUsername());
+        if(foundUser.isPresent())
+            return null;
+        User user = User.builder()
+                .username(postUser.getUsername())
+                .email(postUser.getEmail())
+                .vip(false)
+                .build();
+
+        if (type == 0) {
+            user.setAuthorities("ROLE_ADMIN");
+        } else {
+            user.setAuthorities("ROLE_CUSTOMER");
+        }
+
+        user.setIsActive(true);
+        user.setPassword("{noop}" + postUser.getPassword());
+        return UserRepository.save(user);
+    }
 }

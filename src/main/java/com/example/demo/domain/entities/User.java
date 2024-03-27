@@ -39,6 +39,12 @@ public class User {
     @Column(name = "vip")
     public Boolean vip;
 
+    @Column(name = "authorities")
+    private String authorities;
+
+    @Column(name = "isActive")
+    private Boolean isActive;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_singer",

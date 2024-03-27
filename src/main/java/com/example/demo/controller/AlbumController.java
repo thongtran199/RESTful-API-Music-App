@@ -6,6 +6,7 @@ import com.example.demo.services.AlbumService;
 import com.example.demo.services.SongService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,8 +26,10 @@ public class AlbumController {
 
     @PostMapping(path = "/Album")
     public ResponseEntity<Album> postMapping(@RequestBody final Album Album) {
+        Album.setIsActive(true);
+        Album.setPopularity(0);
         Album savedAlbum = AlbumService.save(Album);
-        return new ResponseEntity<>(savedAlbum, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedAlbum, HttpStatus.OK);
     }
     @PostMapping(path = "/Album/AddSong/{idAlbum}/{idSong}")
     public ResponseEntity<Album> postMapping(@PathVariable("idAlbum") Long idAlbum, @PathVariable("idSong") Long idSong) {
@@ -57,5 +60,12 @@ public class AlbumController {
             return new ResponseEntity<>(entity, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
+    }
+    @GetMapping(path = "/Album/Top")
+    public List<Album> getMappingTop(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<Album> albumPage = AlbumService.findAllByOrderByPopularityDesc(page, size);
+        return albumPage.getContent();
     }
 }

@@ -4,6 +4,9 @@ import com.example.demo.domain.entities.Singer;
 import com.example.demo.repositories.SingerRepository;
 import com.example.demo.services.SingerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,5 +34,11 @@ public class SingerServiceImpl implements SingerService {
     @Override
     public Optional<Singer> findOne(Long id) {
         return SingerRepository.findById(id);
+    }
+
+    @Override
+    public Page<Singer> findAllByOrderByFollowersDesc(int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size);
+        return SingerRepository.findAllByOrderByFollowersDesc(pageable);
     }
 }

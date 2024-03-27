@@ -1,9 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.domain.entities.Album;
+import com.example.demo.domain.entities.*;
 import com.example.demo.domain.entities.Playlist;
-import com.example.demo.domain.entities.Song;
-import com.example.demo.domain.entities.User;
+import com.example.demo.services.PlaylistService;
 import com.example.demo.services.PlaylistService;
 import com.example.demo.services.SongService;
 import com.example.demo.services.UserService;
@@ -36,32 +35,24 @@ public class PlaylistController {
         Optional<User> oUser = UserService.findOne(idUser);
         if(oUser.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+        Playlist.setIsActive(true);
         Playlist.setCreateDate(LocalDate.now());
         Playlist.setPlaylist_user(oUser.get());
         Playlist savedPlaylist = PlaylistService.save(Playlist);
 
-        return new ResponseEntity<>(savedPlaylist, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
     }
-    @PostMapping(path = "/Playlist/AddSong/{idPlaylist}/{idSong}")
-    public ResponseEntity<Playlist> postMappingPlAddSong(@PathVariable("idPlaylist") Long idPlaylist, @PathVariable("idSong") Long idSong) {
-        Optional<Song> foundSong = SongService.findOne(idSong);
+    @PostMapping(path = "/Playlist/AddPlaylist/{idPlaylist}/{idSong}")
+    public ResponseEntity<Playlist> postMappingPlAddPlaylist(@PathVariable("idPlaylist") Long idPlaylist, @PathVariable("idPlaylist") Long idSong) {
         Optional<Playlist> foundPlaylist = PlaylistService.findOne(idPlaylist);
-        if(foundSong.isEmpty() || foundPlaylist.isEmpty())
+        Optional<Song> foundSong = SongService.findOne(idSong);
+        if(foundPlaylist.isEmpty() || foundSong.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Playlist playlist = foundPlaylist.get();
         Song song = foundSong.get();
         playlist.playlist_song.add(song);
         Playlist savedPlaylist = PlaylistService.save(playlist);
         return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
-    }
-    @GetMapping(path = "/Playlist")
-    public List<Playlist> getMapping() {
-        List<Playlist> Playlists = PlaylistService.findAll();
-        return Playlists.stream()
-                .map(entity -> entity)
-                .collect(Collectors.toList());
-
     }
 
     @GetMapping(path = "/Playlist/{id}")
@@ -71,5 +62,26 @@ public class PlaylistController {
             return new ResponseEntity<>(entity, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
+    }
+
+    @GetMapping(path = "/Playlist")
+    public List<Playlist> getMappingByIdUser(@RequestParam(required = false) Long idUser) {
+        if(idUser != null)
+        {
+            return PlaylistService.findAllByIdUserAndIsActiveTrue(idUser);
+        }
+        else {
+            return PlaylistService.findAll();
+        }
+    }
+
+    @DeleteMapping(path = "/Playlist/{id}")
+    public ResponseEntity<Playlist> postMapping(@PathVariable("id") Long id) {
+        Optional<Playlist> foundPlaylist = PlaylistService.findOne(id);
+        if(foundPlaylist.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        foundPlaylist.get().setIsActive(false);
+        Playlist savedPlaylist = PlaylistService.save(foundPlaylist.get());
+        return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
     }
 }

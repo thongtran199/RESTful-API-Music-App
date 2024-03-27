@@ -23,7 +23,7 @@ public class HistoryController {
     @PostMapping(path = "/History")
     public ResponseEntity<History> postMapping(@RequestBody final History History) {
         History savedHistory = HistoryService.save(History);
-        return new ResponseEntity<>(savedHistory, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedHistory, HttpStatus.OK);
     }
 
     @GetMapping(path = "/History")

@@ -13,4 +13,11 @@ public interface UserService {
 
     Optional<User> findOne(Long id);
 
+    Boolean isExist(Long id);
+
+
+    User findByUsername(String username);
+
+    User signUp(User user, Integer type);
+
 }

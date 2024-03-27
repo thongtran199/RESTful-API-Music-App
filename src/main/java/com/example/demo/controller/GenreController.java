@@ -23,7 +23,7 @@ public class GenreController {
     @PostMapping(path = "/Genre")
     public ResponseEntity<Genre> postMapping(@RequestBody final Genre Genre) {
         Genre savedGenre = GenreService.save(Genre);
-        return new ResponseEntity<>(savedGenre, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedGenre, HttpStatus.OK);
     }
 
     @GetMapping(path = "/Genre")

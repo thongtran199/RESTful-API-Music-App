@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.domain.entities.User;
 import com.example.demo.services.UserService;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,15 +16,27 @@ import java.util.stream.Collectors;
 @Log
 @RestController
 public class UserController {
+    @Autowired
     private UserService UserService;
-    public UserController(UserService UserService) {
-        this.UserService = UserService;
+
+    @PostMapping(path = "/Register/{type}")
+    public ResponseEntity<User> signUp(@PathVariable("type") Integer type, @RequestBody final User postUser) {
+        User savedUser = UserService.signUp(postUser, type);
+        if(savedUser == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(savedUser, HttpStatus.OK);
+
     }
 
-    @PostMapping(path = "/User")
-    public ResponseEntity<User> postMapping(@RequestBody final User User) {
-        User savedUser = UserService.save(User);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    @PutMapping(path = "/User/{id}")
+    public ResponseEntity<User> putMapping(@PathVariable("id") Long id,
+                                              @RequestBody User userDto)
+    {
+        if(!UserService.isExist(id))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        userDto.setId(id);
+        User savedUser = UserService.save(userDto);
+        return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
     @GetMapping(path = "/User")

@@ -11,6 +11,8 @@ public interface PlaylistService {
 
     List<Playlist> findAll();
 
+
     Optional<Playlist> findOne(Long id);
 
+    List<Playlist> findAllByIdUserAndIsActiveTrue(Long idUser);
 }
