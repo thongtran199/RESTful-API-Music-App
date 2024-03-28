@@ -2,8 +2,10 @@ package com.example.demo.controller;
 
 import com.example.demo.domain.entities.Album;
 import com.example.demo.domain.entities.Song;
+import com.example.demo.domain.entities.User;
 import com.example.demo.services.AlbumService;
 import com.example.demo.services.SongService;
+import com.example.demo.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,8 @@ public class AlbumController {
     private AlbumService AlbumService;
     @Autowired
     private SongService SongService;
+    @Autowired
+    private UserService UserService;
 
     @PostMapping(path = "/Album")
     public ResponseEntity<Album> postMapping(@RequestBody final Album Album) {
@@ -67,5 +71,19 @@ public class AlbumController {
             @RequestParam(defaultValue = "10") int size) {
         Page<Album> albumPage = AlbumService.findAllByOrderByPopularityDesc(page, size);
         return albumPage.getContent();
+    }
+    @PostMapping(path = "/Album/AddFavorite/{idAlbum}/{idUser}")
+    public ResponseEntity<Album> postMappingAddFavorite(@PathVariable("idAlbum") Long idAlbum, @PathVariable("idUser") Long idUser) {
+        Optional<User> foundUser = UserService.findOne(idUser);
+        Optional<Album> foundAlbum = AlbumService.findOne(idAlbum);
+        if(foundUser.isEmpty() || foundAlbum.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Album album = foundAlbum.get();
+        User user = foundUser.get();
+        user.user_album.add(album);
+        album.setPopularity(album.getPopularity() + 1);
+        Album savedAlbum = AlbumService.save(album);
+        User savedUser = UserService.save(user);
+        return new ResponseEntity<>(savedAlbum, HttpStatus.OK);
     }
 }

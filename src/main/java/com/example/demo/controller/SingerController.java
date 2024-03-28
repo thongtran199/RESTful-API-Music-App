@@ -3,8 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.domain.entities.Album;
 import com.example.demo.domain.entities.Singer;
 import com.example.demo.domain.entities.Song;
+import com.example.demo.domain.entities.User;
 import com.example.demo.services.SingerService;
 import com.example.demo.services.SongService;
+import com.example.demo.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +26,8 @@ public class SingerController {
     private SingerService SingerService;
     @Autowired
     private SongService SongService;
+    @Autowired
+    private UserService UserService;
 
 
     @PostMapping(path = "/Singer")
@@ -42,6 +46,21 @@ public class SingerController {
         Song song = foundSong.get();
         singer.singer_song.add(song);
         Singer savedSinger = SingerService.save(singer);
+        return new ResponseEntity<>(savedSinger, HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/Singer/AddFollowers/{idSinger}/{idUser}")
+    public ResponseEntity<Singer> postMappingAddFollowers(@PathVariable("idSinger") Long idSinger, @PathVariable("idUser") Long idUser) {
+        Optional<User> foundUser = UserService.findOne(idUser);
+        Optional<Singer> foundSinger = SingerService.findOne(idSinger);
+        if(foundUser.isEmpty() || foundSinger.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Singer singer = foundSinger.get();
+        User user = foundUser.get();
+        user.user_singer.add(singer);
+        singer.setFollowers(singer.getFollowers() + 1);
+        Singer savedSinger = SingerService.save(singer);
+        User savedUser = UserService.save(user);
         return new ResponseEntity<>(savedSinger, HttpStatus.OK);
     }
     @GetMapping(path = "/Singer")

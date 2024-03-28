@@ -1,10 +1,9 @@
 package com.example.demo.controller;
 
-import com.example.demo.domain.entities.Album;
-import com.example.demo.domain.entities.Genre;
-import com.example.demo.domain.entities.Song;
+import com.example.demo.domain.entities.*;
 import com.example.demo.services.GenreService;
 import com.example.demo.services.SongService;
+import com.example.demo.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,11 +24,14 @@ public class SongController {
     private SongService SongService;
     @Autowired
     private GenreService GenreService;
+    @Autowired
+    private UserService UserService;
 
 
     @PostMapping(path = "/Song")
     public ResponseEntity<Song> postMapping(@RequestBody final Song Song) {
         Song.isActive = true;
+        Song.popularity = 0;
         Optional<Genre> foundGenre = GenreService.findOne(Song.song_genre.id);
         if(foundGenre.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -61,12 +64,12 @@ public class SongController {
         List<Song> songs = null;
         if (idGenre != null) {
             songs = SongService.findAllByGenre(idGenre);
-        } else if (songName != null) {
-            songs = SongService.findAllBySongName(songName);
-        } else if (singerName != null) {
-            songs = SongService.findSongsBySingerName(singerName);
-        } else {
-            songs = SongService.findAllByIsActiveTrue();
+        } else{
+            songs = new ArrayList<>();
+            if (songName != null)
+                songs.addAll(SongService.findAllBySongName(songName));
+            if (singerName != null)
+                songs.addAll(SongService.findSongsBySingerName(singerName));
         }
         return songs;
     }
@@ -93,5 +96,20 @@ public class SongController {
             @RequestParam(defaultValue = "10") int size) {
         Page<Song> albumPage = SongService.findAllByOrderByReleaseDateDesc(page, size);
         return albumPage.getContent();
+    }
+
+    @PostMapping(path = "/Song/AddFavorite/{idSong}/{idUser}")
+    public ResponseEntity<Song> postMappingAddFavorite(@PathVariable("idSong") Long idSong, @PathVariable("idUser") Long idUser) {
+        Optional<User> foundUser = UserService.findOne(idUser);
+        Optional<Song> foundSong = SongService.findOne(idSong);
+        if(foundUser.isEmpty() || foundSong.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Song song = foundSong.get();
+        User user = foundUser.get();
+        user.user_song.add(song);
+        song.setPopularity(song.getPopularity() + 1);
+        Song savedSong = SongService.save(song);
+        User savedUser = UserService.save(user);
+        return new ResponseEntity<>(savedSong, HttpStatus.OK);
     }
 }

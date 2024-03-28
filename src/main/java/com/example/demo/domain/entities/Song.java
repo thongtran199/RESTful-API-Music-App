@@ -42,7 +42,7 @@ public class Song {
     public String urlSong;
 
     @Column(name = "popularity")
-    public String popularity;
+    public Integer popularity;
 
     @Column(name = "releaseDate")
     public LocalDate releaseDate;
