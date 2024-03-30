@@ -1,6 +1,7 @@
 package com.example.demo.services.impl;
 
 import com.example.demo.domain.entities.Album;
+import com.example.demo.domain.entities.Song;
 import com.example.demo.repositories.AlbumRepository;
 import com.example.demo.services.AlbumService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,4 +41,5 @@ public class AlbumServiceImpl implements AlbumService {
         PageRequest pageable = PageRequest.of(page, size);
         return AlbumRepository.findAllByOrderByPopularityDesc(pageable);
     }
+
 }

@@ -42,8 +42,8 @@ public class PlaylistController {
 
         return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
     }
-    @PostMapping(path = "/Playlist/AddPlaylist/{idPlaylist}/{idSong}")
-    public ResponseEntity<Playlist> postMappingPlAddPlaylist(@PathVariable("idPlaylist") Long idPlaylist, @PathVariable("idPlaylist") Long idSong) {
+    @PostMapping(path = "/Playlist/AddSong/{idPlaylist}/{idSong}")
+    public ResponseEntity<Playlist> postMappingAddSong(@PathVariable("idPlaylist") Long idPlaylist, @PathVariable("idSong") Long idSong) {
         Optional<Playlist> foundPlaylist = PlaylistService.findOne(idPlaylist);
         Optional<Song> foundSong = SongService.findOne(idSong);
         if(foundPlaylist.isEmpty() || foundSong.isEmpty())
@@ -51,6 +51,28 @@ public class PlaylistController {
         Playlist playlist = foundPlaylist.get();
         Song song = foundSong.get();
         playlist.playlist_song.add(song);
+        Playlist savedPlaylist = PlaylistService.save(playlist);
+        return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
+    }
+    @DeleteMapping(path = "/Playlist/DeleteSong/{idPlaylist}/{idSong}")
+    public ResponseEntity<Playlist> deleteMappingDeleteSong(@PathVariable("idPlaylist") Long idPlaylist, @PathVariable("idSong") Long idSong) {
+        Optional<Playlist> foundPlaylist = PlaylistService.findOne(idPlaylist);
+        Optional<Song> foundSong = SongService.findOne(idSong);
+        if(foundPlaylist.isEmpty() || foundSong.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Playlist playlist = foundPlaylist.get();
+
+        boolean songExistsInPlaylist = playlist.playlist_song.stream().anyMatch(s -> s.getId().equals(idSong));
+        if (!songExistsInPlaylist)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        List<Song> updatedSongs = playlist.playlist_song.stream()
+                .filter(s -> !s.getId().equals(idSong))
+                .collect(Collectors.toList());
+
+        playlist.setPlaylist_song(updatedSongs);
+
         Playlist savedPlaylist = PlaylistService.save(playlist);
         return new ResponseEntity<>(savedPlaylist, HttpStatus.OK);
     }

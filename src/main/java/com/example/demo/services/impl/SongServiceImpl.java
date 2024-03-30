@@ -52,6 +52,16 @@ public class SongServiceImpl implements SongService {
     }
 
     @Override
+    public List<Song> findAllSongsByIdAlbum(Long idAlbum) {
+        return SongRepository.findAllSongsByIdAlbum(idAlbum);
+    }
+
+    @Override
+    public List<Song> findAllSongsByIdPlaylist(Long idPlaylist) {
+        return SongRepository.findAllSongsByIdPlaylist(idPlaylist);
+    }
+
+    @Override
     public Optional<Song> findOne(Long id) {
         return SongRepository.findById(id);
     }

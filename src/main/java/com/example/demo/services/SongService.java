@@ -20,6 +20,10 @@ public interface SongService {
     List<Song> findAllBySongName(String songName);
     List<Song> findSongsBySingerName(String singerName);
 
+    List<Song> findAllSongsByIdAlbum(Long idAlbum);
+
+    List<Song> findAllSongsByIdPlaylist(Long idPlaylist);
+
     Optional<Song> findOne(Long id);
 
     Page<Song> findAllByOrderByPopularityDesc(int page, int size);

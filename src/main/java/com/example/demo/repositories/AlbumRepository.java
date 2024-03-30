@@ -15,4 +15,5 @@ import java.util.UUID;
 @Repository
 public interface AlbumRepository extends CrudRepository<Album, Long> {
     Page<Album> findAllByOrderByPopularityDesc(Pageable pageable);
+
 }

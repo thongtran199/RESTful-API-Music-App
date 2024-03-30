@@ -12,4 +12,7 @@ import java.util.UUID;
 public interface PlaylistRepository extends CrudRepository<Playlist, Long> {
     @Query("SELECT p FROM Playlist p WHERE p.playlist_user.id = :idUser AND p.isActive = true")
     List<Playlist> findAllByIdUserAndIsActiveTrue(Long idUser);
+
+    @Query("SELECT p.playlist_song FROM Playlist p WHERE p.id = :idPlaylist")
+    List<Song> findAllSongsByIdPlaylist(Long idPlaylist);
 }

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.domain.entities.Album;
+import com.example.demo.domain.entities.Playlist;
 import com.example.demo.domain.entities.Song;
 import com.example.demo.domain.entities.User;
 import com.example.demo.services.AlbumService;
@@ -84,6 +85,28 @@ public class AlbumController {
         album.setPopularity(album.getPopularity() + 1);
         Album savedAlbum = AlbumService.save(album);
         User savedUser = UserService.save(user);
+        return new ResponseEntity<>(savedAlbum, HttpStatus.OK);
+    }
+    @DeleteMapping(path = "/Album/DeleteSong/{idAlbum}/{idSong}")
+    public ResponseEntity<Album> deleteMappingDeleteSong(@PathVariable("idAlbum") Long idAlbum, @PathVariable("idSong") Long idSong) {
+        Optional<Album> foundAlbum = AlbumService.findOne(idAlbum);
+        Optional<Song> foundSong = SongService.findOne(idSong);
+        if(foundAlbum.isEmpty() || foundSong.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        Album album = foundAlbum.get();
+
+        boolean songExistsInAlbum = album.album_song.stream().anyMatch(s -> s.getId().equals(idSong));
+        if (!songExistsInAlbum)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        List<Song> updatedSongs = album.album_song.stream()
+                .filter(s -> !s.getId().equals(idSong))
+                .collect(Collectors.toList());
+
+        album.setAlbum_song(updatedSongs);
+
+        Album savedAlbum = AlbumService.save(album);
         return new ResponseEntity<>(savedAlbum, HttpStatus.OK);
     }
 }

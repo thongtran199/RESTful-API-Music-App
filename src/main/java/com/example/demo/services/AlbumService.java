@@ -1,6 +1,7 @@
 package com.example.demo.services;
 
 import com.example.demo.domain.entities.Album;
+import com.example.demo.domain.entities.Song;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public interface AlbumService {
     Optional<Album> findOne(Long id);
 
     Page<Album> findAllByOrderByPopularityDesc(int page, int size);
+
 
 }
 

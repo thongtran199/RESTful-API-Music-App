@@ -1,9 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.domain.entities.*;
-import com.example.demo.services.GenreService;
-import com.example.demo.services.SongService;
-import com.example.demo.services.UserService;
+import com.example.demo.services.*;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,6 +50,22 @@ public class SongController {
     @GetMapping(path = "/Song")
     public List<Song> getMapping() {
         List<Song> songs = SongService.findAllByIsActiveTrue();
+        return songs.stream()
+                .map(entity -> entity)
+                .collect(Collectors.toList());
+
+    }
+    @GetMapping(path = "/Song/Album/{id}")
+    public List<Song> getMappingAlbum(@PathVariable("id") Long idAlbum) {
+        List<Song> songs = SongService.findAllSongsByIdAlbum(idAlbum);
+        return songs.stream()
+                .map(entity -> entity)
+                .collect(Collectors.toList());
+
+    }
+    @GetMapping(path = "/Song/Playlist/{id}")
+    public List<Song> getMappingPlaylist(@PathVariable("id") Long idPlaylist) {
+        List<Song> songs = SongService.findAllSongsByIdPlaylist(idPlaylist);
         return songs.stream()
                 .map(entity -> entity)
                 .collect(Collectors.toList());
