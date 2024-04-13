@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.constant.Firebase;
 import com.example.demo.domain.entities.*;
 import com.example.demo.services.*;
 import lombok.extern.java.Log;
@@ -24,17 +25,19 @@ public class SongController {
     private GenreService GenreService;
     @Autowired
     private UserService UserService;
-
+    @Autowired
+    private FirebaseService firebaseService;
 
     @PostMapping(path = "/Song")
-    public ResponseEntity<Song> postMapping(@RequestBody final Song Song) {
+    public ResponseEntity<Song> postMapping(@RequestBody final Song Song, @RequestParam long genreId) {
         Song.isActive = true;
         Song.popularity = 0;
-        Optional<Genre> foundGenre = GenreService.findOne(Song.song_genre.id);
+        Optional<Genre> foundGenre = GenreService.findOne(genreId);
         if(foundGenre.isEmpty())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         Song.setSong_genre(foundGenre.get());
         Song savedSong = SongService.save(Song);
+        firebaseService.sendMessageToFirebase("Bài hát mới", "Nghe ngay", Firebase.getToken());
         return new ResponseEntity<>(savedSong, HttpStatus.OK);
     }
     @DeleteMapping(path = "/Song/{id}")
@@ -111,6 +114,13 @@ public class SongController {
         Page<Song> albumPage = SongService.findAllByOrderByReleaseDateDesc(page, size);
         return albumPage.getContent();
     }
+    @GetMapping(path = "/Song/Favorite/{id}")
+    public List<Song> getMappingFavorite(@PathVariable("id") Long id) {
+        List<Song> songs = SongService.findAllFavoritedSongsByIdUser(id);
+        return songs.stream()
+                .map(entity -> entity)
+                .collect(Collectors.toList());
+    }
 
     @PostMapping(path = "/Song/AddFavorite/{idSong}/{idUser}")
     public ResponseEntity<Song> postMappingAddFavorite(@PathVariable("idSong") Long idSong, @PathVariable("idUser") Long idUser) {
@@ -122,6 +132,35 @@ public class SongController {
         User user = foundUser.get();
         user.user_song.add(song);
         song.setPopularity(song.getPopularity() + 1);
+        Song savedSong = SongService.save(song);
+        User savedUser = UserService.save(user);
+        return new ResponseEntity<>(savedSong, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/Song/DeleteFavorite/{idSong}/{idUser}")
+    public ResponseEntity<Song> postMappingDeleteFavorite(@PathVariable("idSong") Long idSong, @PathVariable("idUser") Long idUser) {
+        Optional<User> foundUser = UserService.findOne(idUser);
+        Optional<Song> foundSong = SongService.findOne(idSong);
+        if(foundUser.isEmpty() || foundSong.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+
+        Song song = foundSong.get();
+        User user = foundUser.get();
+
+
+        boolean songExistsInFavoriteUser = user.user_song.stream().anyMatch(s -> s.getId().equals(idSong));
+        if (!songExistsInFavoriteUser)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        List<Song> updatedSong = user.user_song
+                .stream().filter(s -> !s.getId().equals(idSong))
+                .collect(Collectors.toList());
+
+        user.setUser_song(updatedSong);
+        song.setPopularity(song.getPopularity() - 1);
         Song savedSong = SongService.save(song);
         User savedUser = UserService.save(user);
         return new ResponseEntity<>(savedSong, HttpStatus.OK);

@@ -2,6 +2,7 @@ package com.example.demo.services.impl;
 
 import com.example.demo.domain.entities.Song;
 import com.example.demo.repositories.SongRepository;
+import com.example.demo.services.FirebaseService;
 import com.example.demo.services.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import java.util.stream.StreamSupport;
 public class SongServiceImpl implements SongService {
     @Autowired
     private SongRepository SongRepository;
+
     @Override
     public Song save(Song Song) {
         return SongRepository.save(Song);
@@ -59,6 +61,11 @@ public class SongServiceImpl implements SongService {
     @Override
     public List<Song> findAllSongsByIdPlaylist(Long idPlaylist) {
         return SongRepository.findAllSongsByIdPlaylist(idPlaylist);
+    }
+
+    @Override
+    public List<Song> findAllFavoritedSongsByIdUser(Long idUser) {
+        return SongRepository.findAllFavoritedSongsByIdUser(idUser);
     }
 
     @Override
