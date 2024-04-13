@@ -24,6 +24,8 @@ public interface SongService {
 
     List<Song> findAllSongsByIdPlaylist(Long idPlaylist);
 
+    List<Song> findAllFavoritedSongsByIdUser(Long idUser);
+
     Optional<Song> findOne(Long id);
 
     Page<Song> findAllByOrderByPopularityDesc(int page, int size);

@@ -26,6 +26,9 @@ public interface SongRepository extends CrudRepository<Song, Long> {
     @Query("SELECT s FROM Song s JOIN s.albums album WHERE album.id =:idAlbum")
     List<Song> findAllSongsByIdAlbum(Long idAlbum);
 
+    @Query("SELECT s FROM Song s JOIN s.users user WHERE user.id =:idUser")
+    List<Song> findAllFavoritedSongsByIdUser(Long idUser);
+
     @Query("SELECT s FROM Song s JOIN s.playlists playlist WHERE playlist.id =:idPlaylist")
     List<Song> findAllSongsByIdPlaylist(Long idPlaylist);
     Page<Song> findAllByOrderByPopularityDesc(Pageable pageable);
